@@ -29,10 +29,26 @@
     })();
 
     const displayController = (function () {
-        let _boardElement;
+        const _boardElement = document.querySelector(".board");
+        let _scoreElement = document.querySelector(".score");
 
-        function init(boardElement) {
-            _boardElement = boardElement;
+        function renderBoard(board) {
+            _clearBoard();
+            let index = 0;
+            board.forEach(cell => {
+                _boardElement.appendChild(_createCellElement(cell, index));
+                index++;
+            });
+        }
+
+        function renderScore(player1, player2) {
+            _scoreElement.querySelector("[id='1']").textContent = `${player1.getName()} (${player1.getPiece()}): ${player1.getScore()}`;
+            _scoreElement.querySelector("[id='2']").textContent = `${player2.getName()} (${player2.getPiece()}): ${player2.getScore()}`;
+
+        }
+
+        function getBoardElement() {
+            return _boardElement;
         }
 
         function _createCellElement(piece, index) {
@@ -57,26 +73,20 @@
             })
         }
 
-        function renderBoard(board) {
-            _clearBoard();
-            let index = 0;
-            board.forEach(cell => {
-                _boardElement.appendChild(_createCellElement(cell, index));
-                index++;
-            });
-        }
-
-        return { init, render: renderBoard };
+        return { getBoardElement, renderBoard, renderScore };
     })();
 
     const gameController = (function () {
-        let _currentPiece;
-        let _boardElement;
+        let _currentPlayer;
+        let _player1;
+        let _player2;
 
-        function init(startingPiece, boardElement) {
-            _currentPiece = startingPiece;
-            _boardElement = boardElement;
-            _boardElement.addEventListener("click", (cell) => {
+        function init(player1, player2) {
+            _player1 = player1;
+            _player2 = player2;
+            _currentPlayer = _player1;
+            displayController.renderBoard(boardController.getBoard());
+            displayController.getBoardElement().addEventListener("click", (cell) => {
                 if (cell.target.classList.contains("cell")) {
                     _renderPiece(cell);
                 }
@@ -85,20 +95,16 @@
 
         function _renderPiece(cellElement) {
             let index = cellElement.target.getAttribute("data-index")
-            let success = boardController.addPiece(_currentPiece, index);
-            displayController.render(boardController.getBoard());
-            if (success) _switchPiece();
+            let success = boardController.addPiece(_currentPlayer.getPiece(), index);
+            displayController.renderBoard(boardController.getBoard());
+            if (success) _switchPlayer();
         }
 
-        function _switchPiece() {
-            _currentPiece = (_currentPiece === X) ? O : X;
+        function _switchPlayer() {
+            _currentPlayer = (_currentPlayer === _player1) ? _player2 : _player1;
         }
 
-        function getCurrentPiece() {
-            return _currentPiece;
-        }
-
-        return { init, getCurrentPiece };
+        return { init };
     })();
 
     function createPlayer (name, piece) {
@@ -110,7 +116,6 @@
         }
 
         let _score = 0;
-
         const increseScore = () => _score++;
         const getScore = () => { return _score; };
         const getName = () => { return name; };
@@ -119,13 +124,10 @@
         return { getName, getPiece, increseScore, getScore };
     }
 
-    const bob = createPlayer("bob", X);
-    const ren = createPlayer("ren", O);
+    const bob = createPlayer("Ren", X);
+    const ren = createPlayer("Sam", O);
 
-
-
-
-    displayController.init(BOARD_ELEMENT);
-    displayController.render(boardController.getBoard());
-    gameController.init(X, BOARD_ELEMENT);
+    displayController.renderBoard(boardController.getBoard());
+    displayController.renderScore(bob, ren);
+    gameController.init(bob, ren);
 })();

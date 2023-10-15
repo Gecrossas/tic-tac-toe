@@ -1,11 +1,18 @@
 body {
     font-family: 'Gabarito', sans-serif;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
 }
 
+.score {
+    display: flex;
+    min-width: 315px;
+    justify-content: space-between;
+    font-size: 2rem;
+}
 .board {
     display: grid;
     grid-template-columns: 100px 100px 100px;

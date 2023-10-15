@@ -57,7 +57,7 @@
             })
         }
 
-        function render(board) {
+        function renderBoard(board) {
             _clearBoard();
             let index = 0;
             board.forEach(cell => {
@@ -66,11 +66,7 @@
             });
         }
 
-        function getBoardElement() {
-            return _boardElement;
-        }
-
-        return { init, render };
+        return { init, render: renderBoard };
     })();
 
     const gameController = (function () {
@@ -104,6 +100,30 @@
 
         return { init, getCurrentPiece };
     })();
+
+    function createPlayer (name, piece) {
+        if (name === "") {
+            return console.error("Player name connot be empty.");
+        }
+        if (piece != X && piece != O) {
+            return console.error("Piece value cannot be: " + piece) 
+        }
+
+        let _score = 0;
+
+        const increseScore = () => _score++;
+        const getScore = () => { return _score; };
+        const getName = () => { return name; };
+        const getPiece = () => { return piece; };
+
+        return { getName, getPiece, increseScore, getScore };
+    }
+
+    const bob = createPlayer("bob", X);
+    const ren = createPlayer("ren", O);
+
+
+
 
     displayController.init(BOARD_ELEMENT);
     displayController.render(boardController.getBoard());

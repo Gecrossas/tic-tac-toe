@@ -39,7 +39,7 @@
         const _boardElement = document.querySelector(".board");
         let _scoreElement = document.querySelector(".score");
 
-        async function renderBoard(board) {
+        function renderBoard(board) {
             _clearBoard();
             let index = 0;
             board.forEach(cell => {
@@ -88,7 +88,7 @@
         let _player1;
         let _player2;
 
-        async function init(player1, player2) {
+        function init(player1, player2) {
             _player1 = player1;
             _player2 = player2;
             _currentPlayer = _player1;
@@ -103,7 +103,7 @@
                     }
                 }
             });
-        }
+        };
 
         function _checkWinCondition() {
             const winCombinations = [
@@ -132,17 +132,18 @@
             displayController.renderBoard(boardController.getBoard());
         }
 
-        async function _handleRound() {
+        function _handleRound() {
             displayController.renderBoard(boardController.getBoard());
-            if (_checkWinCondition() === true) {
-                _currentPlayer.increseScore();
-                displayController.renderScore(bob, ren);
-                setTimeout(() => {
+            setTimeout(() => {
+                if (_checkWinCondition() === true) {
+                    _currentPlayer.increseScore();
+                    displayController.renderScore(bob, ren);
                     alert(_currentPlayer.getName() + " has won the round!");
                     _resetGame();
-                }, 100);
-            };
-            _switchPlayer();
+    
+                };
+                _switchPlayer();
+            }, 50);
         }
 
         function _switchPlayer() {
@@ -173,10 +174,4 @@
     const ren = createPlayer("Sam", O);
 
     gameController.init(bob, ren);
-
-    console.log('Start');
-    setTimeout(() => {
-        console.log('After 1000ms');
-    }, 1000);
-    console.log('End');
 })();

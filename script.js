@@ -3,11 +3,7 @@
     const O = "O";
 
     const boardController = (function () {
-        let _board = [
-            "", "", "",
-            "", "", "",
-            "", "", ""
-        ];
+        let _board = Array(9).fill("");
 
         function addPiece(piece, coordinate) {
             if (piece != X && piece != O)
@@ -18,18 +14,14 @@
                 return true;
             }
             return false;
-        };
+        }
 
         function getBoard() {
             return _board;
-        };
+        }
 
         function resetBoard() {
-            _board = [
-                "", "", "",
-                "", "", "",
-                "", "", ""
-            ];
+            _board = Array(9).fill("");
         }
 
         return { addPiece, getBoard, resetBoard };
@@ -37,21 +29,18 @@
 
     const displayController = (function () {
         const _boardElement = document.querySelector(".board");
-        let _scoreElement = document.querySelector(".score");
+        const _scoreElement = document.querySelector(".score");
 
         function renderBoard(board) {
             _clearBoard();
-            let index = 0;
-            board.forEach(cell => {
+            board.forEach((cell, index) => {
                 _boardElement.appendChild(_createCellElement(cell, index));
-                index++;
             });
         }
 
         function renderScore(player1, player2) {
             _scoreElement.querySelector("[id='1']").textContent = `${player1.getName()} (${player1.getPiece()}): ${player1.getScore()}`;
             _scoreElement.querySelector("[id='2']").textContent = `${player2.getName()} (${player2.getPiece()}): ${player2.getScore()}`;
-
         }
 
         function getBoardElement() {
@@ -60,7 +49,7 @@
 
         function _createCellElement(piece, index) {
             const element = document.createElement("div");
-            element.setAttribute("data-index", index)
+            element.setAttribute("data-index", index);
             element.textContent = piece;
             if (piece === X) {
                 element.className = "cell piece-x";
@@ -96,14 +85,19 @@
             displayController.renderScore(bob, ren);
             displayController.getBoardElement().addEventListener("click", (cell) => {
                 if (cell.target.classList.contains("cell")) {
-                    let index = cell.target.getAttribute("data-index")
-                    let piecePlaced = boardController.addPiece(_currentPlayer.getPiece(), index);
+                    const index = cell.target.getAttribute("data-index")
+                    const piecePlaced = boardController.addPiece(_currentPlayer.getPiece(), index);
                     if (piecePlaced) {
                         _handleRound();
                     }
                 }
             });
         };
+
+        function _checkTieCondition() {
+            const board = boardController.getBoard();
+            return !board.some(value => value === "");
+          }
 
         function _checkWinCondition() {
             const winCombinations = [
@@ -135,13 +129,16 @@
         function _handleRound() {
             displayController.renderBoard(boardController.getBoard());
             setTimeout(() => {
-                if (_checkWinCondition() === true) {
-                    _currentPlayer.increseScore();
+                if (_checkWinCondition()) {
+                    _currentPlayer.increaseScore();
                     displayController.renderScore(bob, ren);
                     alert(_currentPlayer.getName() + " has won the round!");
                     _resetGame();
-    
-                };
+                } else if (_checkTieCondition()) {
+                    alert("It's a tie!");
+                    _resetGame();
+                }
+
                 _switchPlayer();
             }, 50);
         }
@@ -162,12 +159,12 @@
         }
 
         let _score = 0;
-        const increseScore = () => _score++;
+        const increaseScore = () => _score++;
         const getScore = () => { return _score; };
         const getName = () => { return name; };
         const getPiece = () => { return piece; };
 
-        return { getName, getPiece, increseScore, getScore };
+        return { getName, getPiece, increaseScore, getScore };
     }
 
     const bob = createPlayer("Ren", X);

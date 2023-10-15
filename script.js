@@ -1,7 +1,6 @@
 (function() {
     const X = "X";
     const O = "O";
-    const BOARD_ELEMENT = document.querySelector(".board");
 
     const boardController = (function () {
         const _board = [
@@ -86,18 +85,49 @@
             _player2 = player2;
             _currentPlayer = _player1;
             displayController.renderBoard(boardController.getBoard());
+            displayController.renderScore(bob, ren);
             displayController.getBoardElement().addEventListener("click", (cell) => {
                 if (cell.target.classList.contains("cell")) {
-                    _renderPiece(cell);
+                    _handleRound(cell);
                 }
             });
         }
 
-        function _renderPiece(cellElement) {
+        function checkWinCondition() {
+            const winCombinations = [
+                [0, 1, 2],
+                [3, 4, 5],
+                [6, 7, 8],
+                [0, 3, 6],
+                [1, 4, 7],
+                [2, 5, 8],
+                [0, 4, 8],
+                [2, 4, 6],
+            ];
+            const currentBoard = boardController.getBoard();
+            const currentPiece = _currentPlayer.getPiece();
+            for (const combination of winCombinations) {
+                const [a, b, c] = combination;
+                if(currentBoard[a] === currentPiece && currentBoard[b] === currentPiece && currentBoard[c] === currentPiece) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        
+
+        function _handleRound(cellElement) {
             let index = cellElement.target.getAttribute("data-index")
-            let success = boardController.addPiece(_currentPlayer.getPiece(), index);
-            displayController.renderBoard(boardController.getBoard());
-            if (success) _switchPlayer();
+            let piecePlaced = boardController.addPiece(_currentPlayer.getPiece(), index);
+            if (piecePlaced) {
+                displayController.renderBoard(boardController.getBoard());
+                if(checkWinCondition() === true) {
+                    _currentPlayer.increseScore();
+                    displayController.renderScore(bob, ren);
+                };
+                _switchPlayer();
+            }
         }
 
         function _switchPlayer() {
@@ -127,7 +157,5 @@
     const bob = createPlayer("Ren", X);
     const ren = createPlayer("Sam", O);
 
-    displayController.renderBoard(boardController.getBoard());
-    displayController.renderScore(bob, ren);
     gameController.init(bob, ren);
 })();

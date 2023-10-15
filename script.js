@@ -1,9 +1,9 @@
-(function() {
+(function () {
     const X = "X";
     const O = "O";
 
     const boardController = (function () {
-        const _board = [
+        let _board = [
             "", "", "",
             "", "", "",
             "", "", ""
@@ -24,14 +24,22 @@
             return _board;
         };
 
-        return { addPiece, getBoard };
+        function resetBoard() {
+            _board = [
+                "", "", "",
+                "", "", "",
+                "", "", ""
+            ];
+        }
+
+        return { addPiece, getBoard, resetBoard };
     })();
 
     const displayController = (function () {
         const _boardElement = document.querySelector(".board");
         let _scoreElement = document.querySelector(".score");
 
-        function renderBoard(board) {
+        async function renderBoard(board) {
             _clearBoard();
             let index = 0;
             board.forEach(cell => {
@@ -80,7 +88,7 @@
         let _player1;
         let _player2;
 
-        function init(player1, player2) {
+        async function init(player1, player2) {
             _player1 = player1;
             _player2 = player2;
             _currentPlayer = _player1;
@@ -88,12 +96,16 @@
             displayController.renderScore(bob, ren);
             displayController.getBoardElement().addEventListener("click", (cell) => {
                 if (cell.target.classList.contains("cell")) {
-                    _handleRound(cell);
+                    let index = cell.target.getAttribute("data-index")
+                    let piecePlaced = boardController.addPiece(_currentPlayer.getPiece(), index);
+                    if (piecePlaced) {
+                        _handleRound();
+                    }
                 }
             });
         }
 
-        function checkWinCondition() {
+        function _checkWinCondition() {
             const winCombinations = [
                 [0, 1, 2],
                 [3, 4, 5],
@@ -108,26 +120,29 @@
             const currentPiece = _currentPlayer.getPiece();
             for (const combination of winCombinations) {
                 const [a, b, c] = combination;
-                if(currentBoard[a] === currentPiece && currentBoard[b] === currentPiece && currentBoard[c] === currentPiece) {
+                if (currentBoard[a] === currentPiece && currentBoard[b] === currentPiece && currentBoard[c] === currentPiece) {
                     return true;
                 }
             }
             return false;
         }
 
-        
+        function _resetGame() {
+            boardController.resetBoard();
+            displayController.renderBoard(boardController.getBoard());
+        }
 
-        function _handleRound(cellElement) {
-            let index = cellElement.target.getAttribute("data-index")
-            let piecePlaced = boardController.addPiece(_currentPlayer.getPiece(), index);
-            if (piecePlaced) {
-                displayController.renderBoard(boardController.getBoard());
-                if(checkWinCondition() === true) {
-                    _currentPlayer.increseScore();
-                    displayController.renderScore(bob, ren);
-                };
-                _switchPlayer();
-            }
+        async function _handleRound() {
+            displayController.renderBoard(boardController.getBoard());
+            if (_checkWinCondition() === true) {
+                _currentPlayer.increseScore();
+                displayController.renderScore(bob, ren);
+                setTimeout(() => {
+                    alert(_currentPlayer.getName() + " has won the round!");
+                    _resetGame();
+                }, 100);
+            };
+            _switchPlayer();
         }
 
         function _switchPlayer() {
@@ -137,12 +152,12 @@
         return { init };
     })();
 
-    function createPlayer (name, piece) {
+    function createPlayer(name, piece) {
         if (name === "") {
             return console.error("Player name connot be empty.");
         }
         if (piece != X && piece != O) {
-            return console.error("Piece value cannot be: " + piece) 
+            return console.error("Piece value cannot be: " + piece)
         }
 
         let _score = 0;
@@ -158,4 +173,10 @@
     const ren = createPlayer("Sam", O);
 
     gameController.init(bob, ren);
+
+    console.log('Start');
+    setTimeout(() => {
+        console.log('After 1000ms');
+    }, 1000);
+    console.log('End');
 })();

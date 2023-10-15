@@ -1,0 +1,25 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: 100px 100px 100px;
+    grid-template-rows: 100px 100px 100px;
+    gap: 5px;
+}
+
+.cell {
+    border: 2px solid black;
+}
+
+.piece-x {
+    background-color: blue;
+}
+
+.piece-o {
+    background-color: red;
+}

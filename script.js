@@ -1,7 +1,7 @@
 const gameBoard = (function () {
     const board = [
         "X", "O", "X",
-        "", "", "",
+        "", "O", "",
         "", "", "O"
     ];
 
@@ -21,13 +21,14 @@ const displayController = (function () {
 
     function createCellElement(piece, index) {
         const element = document.createElement("div");
-        element.className = "cell";
         element.setAttribute("data-index", index)
         element.textContent = piece;
         if (piece === "X") {
-            element.className = "piece-x";
+            element.className = "cell piece-x";
         } else if (piece === "O") {
-            element.className = "piece-o";
+            element.className = "cell piece-o";
+        } else {
+            element.className = "cell";
         }
         
         return element;

@@ -1,4 +1,5 @@
 body {
+    font-family: 'Gabarito', sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -9,7 +10,10 @@ body {
     display: grid;
     grid-template-columns: 100px 100px 100px;
     grid-template-rows: 100px 100px 100px;
+    line-height: 100px;
     gap: 5px;
+    text-align: center;
+    font-size: 5rem;;
 }
 
 .cell {
@@ -17,9 +21,9 @@ body {
 }
 
 .piece-x {
-    background-color: blue;
+    color: blue;
 }
 
 .piece-o {
-    background-color: red;
+    color: red;
 }

@@ -82,12 +82,20 @@
             _player2 = player2;
             _currentPlayer = _player1;
             displayController.renderBoard(boardController.getBoard());
-            displayController.renderScore(bob, ren);
+            displayController.renderScore(_player1, _player2);
             displayController.getBoardElement().addEventListener("click", (cell) => {
                 if (cell.target.classList.contains("cell")) {
-                    const index = cell.target.getAttribute("data-index")
-                    const piecePlaced = boardController.addPiece(_currentPlayer.getPiece(), index);
-                    if (piecePlaced) {
+                    if (_currentPlayer.isHuman()) {
+                        const index = cell.target.getAttribute("data-index")
+                        const piecePlaced = boardController.addPiece(_currentPlayer.getPiece(), index);
+                        if (piecePlaced) {
+                            _handleRound();
+                        }
+                    } else {
+                        boardController.addPiece(
+                            _currentPlayer.getPiece(), 
+                            _currentPlayer.makeRandomMove(boardController.getBoard())
+                            );
                         _handleRound();
                     }
                 }
@@ -97,7 +105,7 @@
         function _checkTieCondition() {
             const board = boardController.getBoard();
             return !board.some(value => value === "");
-          }
+        }
 
         function _checkWinCondition() {
             const winCombinations = [
@@ -131,14 +139,14 @@
             setTimeout(() => {
                 if (_checkWinCondition()) {
                     _currentPlayer.increaseScore();
-                    displayController.renderScore(bob, ren);
+                    displayController.renderScore(_player1, _player2);
                     alert(_currentPlayer.getName() + " has won the round!");
                     _resetGame();
                 } else if (_checkTieCondition()) {
                     alert("It's a tie!");
                     _resetGame();
                 }
-
+                console.log(_player2.makeRandomMove(boardController.getBoard()));
                 _switchPlayer();
             }, 50);
         }
@@ -152,23 +160,46 @@
 
     function createPlayer(name, piece) {
         if (name === "") {
-            return console.error("Player name connot be empty.");
+            console.error("Player name connot be empty.");
+            return null;
         }
         if (piece != X && piece != O) {
-            return console.error("Piece value cannot be: " + piece)
+            console.error("Piece value cannot be: " + piece);
+            return null;
         }
 
         let _score = 0;
+
         const increaseScore = () => _score++;
         const getScore = () => { return _score; };
         const getName = () => { return name; };
         const getPiece = () => { return piece; };
+        const isHuman = () => { return true };
 
-        return { getName, getPiece, increaseScore, getScore };
+        return { getName, getPiece, increaseScore, getScore, isHuman };
     }
 
-    const bob = createPlayer("Ren", X);
-    const ren = createPlayer("Sam", O);
+    function createComputerPlayer(piece) {
+        const player = createPlayer("Computer", piece);
 
-    gameController.init(bob, ren);
+        const isHuman = () => { return false };
+        const makeRandomMove = function (board) {
+            let possibleMoves = [];
+            board.forEach((value, index) => {
+                if (value === "") {
+                    possibleMoves.push(index);
+                }
+            })
+            if (possibleMoves.length === 0) return undefined;
+            const randomIndex = Math.floor(Math.random() * possibleMoves.length);
+            return possibleMoves[randomIndex];
+        }
+        return { ...player, makeRandomMove, isHuman };
+    }
+
+    const bob = createPlayer("Bob", X);
+    const ren = createPlayer("Ren", O);
+    const computer = createComputerPlayer(O);
+
+    gameController.init(bob, computer);
 })();

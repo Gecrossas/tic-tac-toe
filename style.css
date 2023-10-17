@@ -28,6 +28,8 @@ body {
     gap: 5px;
     text-align: center;
     font-size: 5rem;;
+    margin-top: 1rem;
+
 }
 
 .cell {
@@ -40,4 +42,11 @@ body {
 
 .piece-o {
     color: red;
+}
+
+button {
+    font-size: 2rem;
+    border-radius: 10px;
+    margin-top: 2rem;
+    padding: 1rem;
 }

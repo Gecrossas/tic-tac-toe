@@ -1,3 +1,8 @@
+:root {
+    --button-scale: 1;
+    --box-shadow-color: rgba(0, 0, 0, 0.2);
+}
+
 body {
     font-family: 'Gabarito', sans-serif;
     display: flex;
@@ -46,7 +51,31 @@ body {
 
 button {
     font-size: 2rem;
+    border: none;
     border-radius: 10px;
     margin-top: 2rem;
     padding: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+    background-color: #3498db;
+    color: #fff;
+}
+
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px var(--box-shadow-color);
+}
+
+button:active {
+    transform: scale(0.95);
+    box-shadow: none;
+}
+
+button:focus {
+    outline: none;
+}
+
+/* Change the button background color when active (clicked) */
+button:active {
+    background-color: #2980b9;
 }

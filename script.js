@@ -30,6 +30,8 @@
     const displayController = (function () {
         const _boardElement = document.querySelector(".board");
         const _scoreElement = document.querySelector(".score");
+        const _resultElement = document.querySelector(".result");
+
 
         function renderBoard(board) {
             _clearBoard();
@@ -47,8 +49,16 @@
             return _boardElement;
         }
 
-        function renderWinMessage() {
-            
+        function renderResultMessage(name) {
+            if (name === null) {
+                _resultElement.textContent = "It's a tie!";
+            } else {
+                _resultElement.textContent = `${name} has won the round!`;
+            }
+        }
+
+        function removeResultMessage() {
+            _resultElement.textContent = "";
         }
 
         function _createCellElement(piece, index) {
@@ -73,10 +83,11 @@
             })
         }
 
-        return { getBoardElement, renderBoard, renderScore };
+        return { getBoardElement, renderBoard, renderScore, renderResultMessage, removeResultMessage };
     })();
 
     const gameController = (function () {
+        let _play = true;
         let _currentPlayer;
         let _player1;
         let _player2;
@@ -89,22 +100,41 @@
             displayController.renderScore(_player1, _player2);
             displayController.getBoardElement().addEventListener("click", (cell) => {
                 if (cell.target.classList.contains("cell")) {
-                    if (_currentPlayer.isHuman()) {
-                        const index = cell.target.getAttribute("data-index")
-                        const piecePlaced = boardController.addPiece(_currentPlayer.getPiece(), index);
-                        if (piecePlaced) {
-                            _handleRound();
-                            //Computer player:
-                            boardController.addPiece(
-                                _currentPlayer.getPiece(),
-                                _currentPlayer.makeRandomMove(boardController.getBoard())
-                            );
-                            _handleRound();
+                    if(_play){
+                        if (_currentPlayer.isHuman()) {
+                            const index = cell.target.getAttribute("data-index")
+                            const piecePlaced = boardController.addPiece(_currentPlayer.getPiece(), index);
+                            if (piecePlaced) {
+                                _handleRound();
+                                //Computer player:
+                                if(_play){
+                                    boardController.addPiece(
+                                        _currentPlayer.getPiece(),
+                                        _currentPlayer.makeRandomMove(boardController.getBoard())
+                                    );
+                                    _handleRound();
+                                }
+                            }
                         }
                     }
                 }
             });
         };
+
+        function _handleRound() {
+            displayController.renderBoard(boardController.getBoard());
+            if (_checkWinCondition()) {
+                _currentPlayer.increaseScore();
+                displayController.renderScore(_player1, _player2);
+                displayController.renderResultMessage(_currentPlayer.getName());
+                _play = false;
+            } else if (_checkTieCondition()) {
+                displayController.renderResultMessage(null);
+                _play = false;
+            }
+            console.log(_player2.makeRandomMove(boardController.getBoard()));
+            _switchPlayer();
+        }
 
         function _checkTieCondition() {
             const board = boardController.getBoard();
@@ -136,21 +166,6 @@
         function _resetGame() {
             boardController.resetBoard();
             displayController.renderBoard(boardController.getBoard());
-        }
-
-        function _handleRound() {
-            displayController.renderBoard(boardController.getBoard());
-            if (_checkWinCondition()) {
-                _currentPlayer.increaseScore();
-                displayController.renderScore(_player1, _player2);
-                alert(_currentPlayer.getName() + " has won the round!");
-                _resetGame();
-            } else if (_checkTieCondition()) {
-                alert("It's a tie!");
-                _resetGame();
-            }
-            console.log(_player2.makeRandomMove(boardController.getBoard()));
-            _switchPlayer();
         }
 
         function _switchPlayer() {

@@ -16,6 +16,7 @@ body {
     font-size: 2rem;
     padding-bottom: 1rem;
     color: blue;
+    height: 2rem;
 }
 
 .score {
@@ -69,13 +70,15 @@ button:hover {
 button:active {
     transform: scale(0.95);
     box-shadow: none;
+    background-color: #2980b9;
 }
 
 button:focus {
     outline: none;
 }
 
-/* Change the button background color when active (clicked) */
-button:active {
-    background-color: #2980b9;
+button:disabled {
+    background-color: gray;
+    transform: none;
+    box-shadow: none;
 }

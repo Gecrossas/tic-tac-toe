@@ -87,7 +87,9 @@
     })();
 
     const gameController = (function () {
+        const _nextRoundButton = document.querySelector("button");
         let _play = true;
+        let _isResetting = false;
         let _currentPlayer;
         let _player1;
         let _player2;
@@ -96,18 +98,19 @@
             _player1 = player1;
             _player2 = player2;
             _currentPlayer = _player1;
+            _nextRoundButton.disabled = true;
             displayController.renderBoard(boardController.getBoard());
             displayController.renderScore(_player1, _player2);
             displayController.getBoardElement().addEventListener("click", (cell) => {
                 if (cell.target.classList.contains("cell")) {
-                    if(_play){
+                    if (_play) {
                         if (_currentPlayer.isHuman()) {
                             const index = cell.target.getAttribute("data-index")
                             const piecePlaced = boardController.addPiece(_currentPlayer.getPiece(), index);
                             if (piecePlaced) {
                                 _handleRound();
                                 //Computer player:
-                                if(_play){
+                                if (_play) {
                                     boardController.addPiece(
                                         _currentPlayer.getPiece(),
                                         _currentPlayer.makeRandomMove(boardController.getBoard())
@@ -119,6 +122,21 @@
                     }
                 }
             });
+            _nextRoundButton.addEventListener("click", () => {
+                if (!_isResetting) {
+                    _isResetting = true;
+                    _resetGame();
+                    _nextRoundButton.disabled = true;
+                }
+                //If computer goes first on new game:
+                if (!_currentPlayer.isHuman()) {
+                    boardController.addPiece(
+                        _currentPlayer.getPiece(),
+                        _currentPlayer.makeRandomMove(boardController.getBoard())
+                    );
+                    _handleRound();
+                }
+            })
         };
 
         function _handleRound() {
@@ -132,8 +150,8 @@
                 displayController.renderResultMessage(null);
                 _play = false;
             }
-            console.log(_player2.makeRandomMove(boardController.getBoard()));
             _switchPlayer();
+            if (!_play) _nextRoundButton.disabled = false;
         }
 
         function _checkTieCondition() {
@@ -166,6 +184,9 @@
         function _resetGame() {
             boardController.resetBoard();
             displayController.renderBoard(boardController.getBoard());
+            displayController.removeResultMessage();
+            _play = true;
+            _isResetting = false;
         }
 
         function _switchPlayer() {
